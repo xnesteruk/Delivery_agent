@@ -8,6 +8,7 @@ from simulation.models import (
     Position,
 )
 from simulation.observation import AgentObservation
+from simulation.road_closures import ClosureSchedule, RoadClosure
 from simulation.sensors import Direction, VisionSensor
 
 
@@ -19,6 +20,7 @@ class Environment:
         blocked_cells: set[tuple[int, int]] | None = None,
         closures: set[tuple[int, int]] | None = None,
         initial_direction: Direction = Direction.EAST,
+        scheduled_closures: list[RoadClosure] | None = None,
     ):
         self._config = config
         self._current_time = 0
@@ -30,21 +32,33 @@ class Environment:
         self._blocked_cells = set(
             blocked_cells if blocked_cells is not None else ()
         )
-        self._closures = set(
+
+        # These closures remain active for the entire run.
+        self._fixed_closures = set(
             closures if closures is not None else ()
         )
 
-        for x, y in self._blocked_cells | self._closures:
+        self._closure_schedule = ClosureSchedule(
+            scheduled_closures if scheduled_closures is not None else []
+        )
+
+        all_closure_cells = (
+            self._fixed_closures
+            | self._closure_schedule.affected_cells
+        )
+
+        for x, y in self._blocked_cells | all_closure_cells:
             if not self._is_inside_map(Position(x, y)):
                 raise ValueError("Obstacle is outside the map.")
 
-        if self._blocked_cells & self._closures:
+        if self._blocked_cells & all_closure_cells:
             raise ValueError("A closure cannot be inside a building.")
 
         depot_x, depot_y = config.depot_position
         self._depot_position = Position(depot_x, depot_y)
 
-        if (depot_x, depot_y) in self._blocked_cells | self._closures:
+        # Keep the depot accessible throughout the simulation.
+        if (depot_x, depot_y) in self._blocked_cells | all_closure_cells:
             raise ValueError("Depot cannot be blocked.")
 
         self._courier = Courier(
@@ -86,6 +100,12 @@ class Environment:
             and 0 <= position.y < self._config.map_height
         )
 
+    def _active_closures(self) -> set[tuple[int, int]]:
+        return (
+            self._fixed_closures
+            | self._closure_schedule.active_cells(self._current_time)
+        )
+
     def get_observation(self) -> AgentObservation:
         position = self._courier.position
 
@@ -95,7 +115,7 @@ class Environment:
             map_width=self._config.map_width,
             map_height=self._config.map_height,
             buildings=self._blocked_cells,
-            closures=self._closures,
+            closures=self._active_closures(),
         )
 
         available_letters = tuple(
@@ -166,7 +186,7 @@ class Environment:
             )
             return
 
-        if cell in self._closures:
+        if cell in self._active_closures():
             self._current_time += 1
             self._last_action_result = (
                 "Movement failed: road is temporarily closed."

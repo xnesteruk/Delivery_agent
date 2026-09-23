@@ -11,19 +11,25 @@ class DeliveryAgent:
         map_height: int,
         blocked_cells: set[tuple[int, int]] | None = None,
         move_minutes: int = 6,
+        closure_memory_minutes: int = 12,
     ):
         if move_minutes <= 0:
             raise ValueError("Movement time must be positive.")
 
+        if closure_memory_minutes <= 0:
+            raise ValueError("Closure memory duration must be positive.")
+
         self._map_width = map_width
         self._map_height = map_height
         self._move_minutes = move_minutes
+        self._closure_memory_minutes = closure_memory_minutes
 
         self._blocked_cells = frozenset(
             blocked_cells if blocked_cells is not None else ()
         )
 
-        self._known_closures: set[tuple[int, int]] = set()
+        # Cell -> simulation time when its closure was last observed.
+        self._known_closures: dict[tuple[int, int], int] = {}
 
     @property
     def known_closures(self) -> frozenset[tuple[int, int]]:
@@ -73,7 +79,6 @@ class DeliveryAgent:
                 continue
 
             travel_minutes = len(path) * self._move_minutes
-
             slack = (
                 letter.deadline
                 - observation.current_time
@@ -120,11 +125,22 @@ class DeliveryAgent:
         return Action(ActionType.WAIT)
 
     def _update_memory(self, observation: AgentObservation) -> None:
+        current_time = observation.current_time
         vision = observation.vision
 
-        # Replace old information only for cells currently visible.
-        self._known_closures.difference_update(vision.visible_cells)
-        self._known_closures.update(vision.visible_closures)
+        # Remove outdated information.
+        self._known_closures = {
+            cell: last_seen
+            for cell, last_seen in self._known_closures.items()
+            if current_time - last_seen < self._closure_memory_minutes
+        }
+
+        # Current observations override remembered information.
+        for cell in vision.visible_cells:
+            if cell in vision.visible_closures:
+                self._known_closures[cell] = current_time
+            else:
+                self._known_closures.pop(cell, None)
 
     def _find_path(
         self,
@@ -134,12 +150,16 @@ class DeliveryAgent:
         start_cell = (start.x, start.y)
         goal_cell = (goal.x, goal.y)
 
-        if not self._is_walkable(start_cell):
+        if not self._is_static_walkable(start_cell):
             return None
+
+        if start_cell == goal_cell:
+            return []
 
         if not self._is_walkable(goal_cell):
             return None
 
+        # The courier may leave a cell that closed while occupied.
         frontier = deque([start_cell])
         came_from = {start_cell: None}
 
@@ -170,13 +190,18 @@ class DeliveryAgent:
 
         return None
 
-    def _is_walkable(self, cell: tuple[int, int]) -> bool:
+    def _is_static_walkable(self, cell: tuple[int, int]) -> bool:
         x, y = cell
 
         return (
             0 <= x < self._map_width
             and 0 <= y < self._map_height
             and cell not in self._blocked_cells
+        )
+
+    def _is_walkable(self, cell: tuple[int, int]) -> bool:
+        return (
+            self._is_static_walkable(cell)
             and cell not in self._known_closures
         )
 

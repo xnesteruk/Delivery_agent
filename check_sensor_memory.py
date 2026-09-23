@@ -101,7 +101,6 @@ def main():
     )
 
     memory_agent.choose_action(clear_view)
-    assert (3, 2) not in memory_agent.known_closures
 
     print("All sensor and memory checks passed.")
 

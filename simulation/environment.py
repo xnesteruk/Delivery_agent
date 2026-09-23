@@ -1,12 +1,21 @@
-from config import SimulationConfig
-from models import Position, Letter, Courier, LetterObservation, Observation
-from models import Action, ActionType
+from simulation.config import SimulationConfig
+from simulation.models import (
+    Action,
+    ActionType,
+    Courier,
+    Letter,
+    LetterObservation,
+    Observation,
+    Position,
+)
+
 
 class Environment:
     def __init__(
         self,
         config: SimulationConfig,
         letters: list[Letter],
+        blocked_cells: set[tuple[int, int]] | None = None,
     ):
         self._config = config
         self._current_time = 0
@@ -14,6 +23,17 @@ class Environment:
 
         depot_x, depot_y = config.depot_position
         self._depot_position = Position(depot_x, depot_y)
+
+        self._blocked_cells = set(
+            blocked_cells if blocked_cells is not None else ()
+        )
+
+        for x, y in self._blocked_cells:
+            if not self._is_inside_map(Position(x, y)):
+                raise ValueError("Blocked cell is outside the map.")
+
+        if (depot_x, depot_y) in self._blocked_cells:
+            raise ValueError("Depot cannot be on a blocked cell.")
 
         self._courier = Courier(
             position=self._depot_position,
@@ -32,33 +52,20 @@ class Environment:
                     "outside the map."
                 )
 
+            coordinates = (
+                letter.destination.x,
+                letter.destination.y,
+            )
+
+            if coordinates in self._blocked_cells:
+                raise ValueError(
+                    "Letter destination cannot be on a blocked cell."
+                )
+
             if letter.is_picked_up:
                 raise ValueError("Simulation requires uncollected letters.")
 
             self._letters[letter.letter_id] = letter
-
-    def _move(self, destination: Position) -> None:
-        if not self._is_inside_map(destination):
-            self._last_action_result = (
-                "Movement failed: destination is outside the map."
-            )
-            return
-
-        current = self._courier.position
-        distance = (
-                abs(destination.x - current.x)
-                + abs(destination.y - current.y)
-        )
-
-        if distance != 1:
-            self._last_action_result = (
-                "Movement failed: choose an adjacent cell."
-            )
-            return
-
-        self._courier.position = destination
-        self._current_time += self._config.move_minutes
-        self._last_action_result = "Moved successfully."
 
     @property
     def current_time(self) -> int:
@@ -103,10 +110,39 @@ class Environment:
             self._wait()
         else:
             raise NotImplementedError(
-                f"Action {action.action_type.value} is not implemented yet."
+                f"Action {action.action_type} is not implemented."
             )
 
         return self.get_observation()
+
+    def _move(self, destination: Position) -> None:
+        if not self._is_inside_map(destination):
+            self._last_action_result = (
+                "Movement failed: destination is outside the map."
+            )
+            return
+
+        current = self._courier.position
+        distance = (
+            abs(destination.x - current.x)
+            + abs(destination.y - current.y)
+        )
+
+        if distance != 1:
+            self._last_action_result = (
+                "Movement failed: choose an adjacent cell."
+            )
+            return
+
+        if (destination.x, destination.y) in self._blocked_cells:
+            self._last_action_result = (
+                "Movement failed: cell is blocked."
+            )
+            return
+
+        self._courier.position = destination
+        self._current_time += self._config.move_minutes
+        self._last_action_result = "Moved successfully."
 
     def _pick_up(self, letter_id: int) -> None:
         if self._courier.position != self._depot_position:
@@ -118,19 +154,27 @@ class Environment:
         letter = self._letters.get(letter_id)
 
         if letter is None:
-            self._last_action_result = "Pickup failed: unknown letter ID."
+            self._last_action_result = (
+                "Pickup failed: unknown letter ID."
+            )
             return
 
         if letter.available_time > self._current_time:
-            self._last_action_result = "Pickup failed: letter is not available yet."
+            self._last_action_result = (
+                "Pickup failed: letter is not available yet."
+            )
             return
 
         if letter.is_picked_up:
-            self._last_action_result = "Pickup failed: letter already picked up."
+            self._last_action_result = (
+                "Pickup failed: letter already picked up."
+            )
             return
 
         if self._courier.remaining_capacity == 0:
-            self._last_action_result = "Pickup failed: courier is at full capacity."
+            self._last_action_result = (
+                "Pickup failed: courier is at full capacity."
+            )
             return
 
         self._courier.pick_up(letter, self._current_time)

@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 class SimulationConfig:
     def __init__(
         self,
@@ -16,6 +19,13 @@ class SimulationConfig:
         # Fixed rules of our simulation
         self._cell_distance_meters = 500
         self._move_minutes = 6
+
+    @classmethod
+    def from_json(cls, path: str | Path) -> "SimulationConfig":
+        with open(path, encoding="utf-8") as file:
+            data = json.load(file)
+
+        return cls(**data)
 
     @property
     def map_width(self) -> int:

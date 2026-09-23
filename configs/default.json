@@ -1,0 +1,7 @@
+{
+  "map_width": 5,
+  "map_height": 5,
+  "carrying_capacity": 10,
+  "delivery_allowance_minutes": 120,
+  "seed": 42
+}

@@ -1,6 +1,7 @@
 from collections import deque
 
-from simulation.models import Action, ActionType, Observation, Position
+from simulation.models import Action, ActionType, Position
+from simulation.observation import AgentObservation
 
 
 class DeliveryAgent:
@@ -22,7 +23,15 @@ class DeliveryAgent:
             blocked_cells if blocked_cells is not None else ()
         )
 
-    def choose_action(self, observation: Observation) -> Action:
+        self._known_closures: set[tuple[int, int]] = set()
+
+    @property
+    def known_closures(self) -> frozenset[tuple[int, int]]:
+        return frozenset(self._known_closures)
+
+    def choose_action(self, observation: AgentObservation) -> Action:
+        self._update_memory(observation)
+
         position = observation.courier_position
 
         carried_letters = [
@@ -31,7 +40,6 @@ class DeliveryAgent:
             if letter.is_picked_up and not letter.is_delivered
         ]
 
-        # Deliver immediately at the current address.
         for letter in carried_letters:
             if letter.destination == position:
                 return Action(
@@ -39,7 +47,6 @@ class DeliveryAgent:
                     letter_id=letter.letter_id,
                 )
 
-        # Collect reachable letters while at the depot.
         if (
             position == observation.depot_position
             and observation.remaining_capacity > 0
@@ -74,7 +81,6 @@ class DeliveryAgent:
             )
 
             if slack >= 0:
-                # Deliverable on time: smallest time margin first.
                 priority = (
                     0,
                     slack,
@@ -82,8 +88,6 @@ class DeliveryAgent:
                     letter.letter_id,
                 )
             else:
-                # Already impossible to deliver on time:
-                # prefer the nearest if no on-time option exists.
                 priority = (
                     1,
                     travel_minutes,
@@ -101,7 +105,6 @@ class DeliveryAgent:
                 destination=best_path[0],
             )
 
-        # Return to the depot when the bag is empty.
         if not carried_letters and position != observation.depot_position:
             path = self._find_path(
                 position,
@@ -115,6 +118,13 @@ class DeliveryAgent:
                 )
 
         return Action(ActionType.WAIT)
+
+    def _update_memory(self, observation: AgentObservation) -> None:
+        vision = observation.vision
+
+        # Replace old information only for cells currently visible.
+        self._known_closures.difference_update(vision.visible_cells)
+        self._known_closures.update(vision.visible_closures)
 
     def _find_path(
         self,
@@ -167,6 +177,7 @@ class DeliveryAgent:
             0 <= x < self._map_width
             and 0 <= y < self._map_height
             and cell not in self._blocked_cells
+            and cell not in self._known_closures
         )
 
     def _restore_path(

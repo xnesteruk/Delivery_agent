@@ -4,10 +4,11 @@ from simulation.models import (
     ActionType,
     Courier,
     Letter,
-    LetterObservation,
-    Observation,
+    LetterInfo,
     Position,
 )
+from simulation.observation import AgentObservation
+from simulation.sensors import Direction, VisionSensor
 
 
 class Environment:
@@ -16,24 +17,35 @@ class Environment:
         config: SimulationConfig,
         letters: list[Letter],
         blocked_cells: set[tuple[int, int]] | None = None,
+        closures: set[tuple[int, int]] | None = None,
+        initial_direction: Direction = Direction.EAST,
     ):
         self._config = config
         self._current_time = 0
         self._last_action_result = None
 
-        depot_x, depot_y = config.depot_position
-        self._depot_position = Position(depot_x, depot_y)
+        self._direction = initial_direction
+        self._vision_sensor = VisionSensor(side_range=2)
 
         self._blocked_cells = set(
             blocked_cells if blocked_cells is not None else ()
         )
+        self._closures = set(
+            closures if closures is not None else ()
+        )
 
-        for x, y in self._blocked_cells:
+        for x, y in self._blocked_cells | self._closures:
             if not self._is_inside_map(Position(x, y)):
-                raise ValueError("Blocked cell is outside the map.")
+                raise ValueError("Obstacle is outside the map.")
 
-        if (depot_x, depot_y) in self._blocked_cells:
-            raise ValueError("Depot cannot be on a blocked cell.")
+        if self._blocked_cells & self._closures:
+            raise ValueError("A closure cannot be inside a building.")
+
+        depot_x, depot_y = config.depot_position
+        self._depot_position = Position(depot_x, depot_y)
+
+        if (depot_x, depot_y) in self._blocked_cells | self._closures:
+            raise ValueError("Depot cannot be blocked.")
 
         self._courier = Courier(
             position=self._depot_position,
@@ -47,19 +59,16 @@ class Environment:
                 raise ValueError("Letter IDs must be unique.")
 
             if not self._is_inside_map(letter.destination):
-                raise ValueError(
-                    f"Letter {letter.letter_id} has a destination "
-                    "outside the map."
-                )
+                raise ValueError("Letter destination is outside the map.")
 
-            coordinates = (
+            destination = (
                 letter.destination.x,
                 letter.destination.y,
             )
 
-            if coordinates in self._blocked_cells:
+            if destination in self._blocked_cells:
                 raise ValueError(
-                    "Letter destination cannot be on a blocked cell."
+                    "Letter destination cannot be inside a building."
                 )
 
             if letter.is_picked_up:
@@ -77,19 +86,35 @@ class Environment:
             and 0 <= position.y < self._config.map_height
         )
 
-    def get_observation(self) -> Observation:
-        visible_letters = []
+    def get_observation(self) -> AgentObservation:
+        position = self._courier.position
 
-        for letter in self._letters.values():
-            if letter.available_time <= self._current_time:
-                visible_letters.append(LetterObservation(letter))
+        vision = self._vision_sensor.observe(
+            position=(position.x, position.y),
+            direction=self._direction,
+            map_width=self._config.map_width,
+            map_height=self._config.map_height,
+            buildings=self._blocked_cells,
+            closures=self._closures,
+        )
 
-        return Observation(
+        available_letters = tuple(
+            LetterInfo(letter)
+            for letter in self._letters.values()
+            if letter.available_time <= self._current_time
+        )
+
+        return AgentObservation(
             current_time=self._current_time,
-            courier_position=self._courier.position,
-            depot_position=self._depot_position,
+            courier_position=Position(position.x, position.y),
+            depot_position=Position(
+                self._depot_position.x,
+                self._depot_position.y,
+            ),
             remaining_capacity=self._courier.remaining_capacity,
-            letters=tuple(visible_letters),
+            letters=available_letters,
+            direction=self._direction,
+            vision=vision,
             last_action_result=self._last_action_result,
         )
 
@@ -99,7 +124,7 @@ class Environment:
             for letter in self._letters.values()
         )
 
-    def step(self, action: Action) -> Observation:
+    def step(self, action: Action) -> AgentObservation:
         if action.action_type == ActionType.MOVE:
             self._move(action.destination)
         elif action.action_type == ActionType.PICK_UP:
@@ -123,20 +148,28 @@ class Environment:
             return
 
         current = self._courier.position
-        distance = (
-            abs(destination.x - current.x)
-            + abs(destination.y - current.y)
-        )
+        dx = destination.x - current.x
+        dy = destination.y - current.y
 
-        if distance != 1:
+        if abs(dx) + abs(dy) != 1:
             self._last_action_result = (
                 "Movement failed: choose an adjacent cell."
             )
             return
 
-        if (destination.x, destination.y) in self._blocked_cells:
+        self._direction = Direction((dx, dy))
+        cell = (destination.x, destination.y)
+
+        if cell in self._blocked_cells:
             self._last_action_result = (
                 "Movement failed: cell is blocked."
+            )
+            return
+
+        if cell in self._closures:
+            self._current_time += 1
+            self._last_action_result = (
+                "Movement failed: road is temporarily closed."
             )
             return
 

@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Position:
     def __init__(self, x: int, y: int):
         self._x = x
@@ -23,8 +24,6 @@ class Position:
         return f"Position(x={self.x}, y={self.y})"
 
 
-
-
 class Letter:
     def __init__(
         self,
@@ -42,7 +41,6 @@ class Letter:
         self._letter_id = letter_id
         self._destination = destination
         self._available_time = available_time
-
         self._deadline = available_time + delivery_allowance_minutes
         self._pickup_time = None
         self._delivery_time = None
@@ -197,7 +195,9 @@ class Action:
                 raise ValueError("Pickup and delivery require a letter ID.")
 
             if destination is not None:
-                raise ValueError("Pickup and delivery do not use a destination.")
+                raise ValueError(
+                    "Pickup and delivery do not use a destination."
+                )
 
         elif destination is not None or letter_id is not None:
             raise ValueError("Waiting does not use a destination or letter ID.")
@@ -219,16 +219,13 @@ class Action:
         return self._letter_id
 
 
-class LetterObservation:
+class LetterInfo:
     def __init__(self, letter: Letter):
         self._letter_id = letter.letter_id
-
-        # Copy the coordinates instead of sharing the original position.
         self._destination = Position(
             letter.destination.x,
             letter.destination.y,
         )
-
         self._available_time = letter.available_time
         self._deadline = letter.deadline
         self._is_picked_up = letter.is_picked_up
@@ -257,54 +254,3 @@ class LetterObservation:
     @property
     def is_delivered(self) -> bool:
         return self._is_delivered
-
-
-class Observation:
-    def __init__(
-        self,
-        current_time: int,
-        courier_position: Position,
-        depot_position: Position,
-        remaining_capacity: int,
-        letters: tuple[LetterObservation, ...],
-        last_action_result: str | None = None,
-    ):
-        self._current_time = current_time
-
-        self._courier_position = Position(
-            courier_position.x,
-            courier_position.y,
-        )
-
-        self._depot_position = Position(
-            depot_position.x,
-            depot_position.y,
-        )
-
-        self._remaining_capacity = remaining_capacity
-        self._letters = tuple(letters)
-        self._last_action_result = last_action_result
-
-    @property
-    def current_time(self) -> int:
-        return self._current_time
-
-    @property
-    def courier_position(self) -> Position:
-        return self._courier_position
-
-    @property
-    def depot_position(self) -> Position:
-        return self._depot_position
-
-    @property
-    def remaining_capacity(self) -> int:
-        return self._remaining_capacity
-
-    @property
-    def letters(self) -> tuple[LetterObservation, ...]:
-        return self._letters
-
-    @property
-    def last_action_result(self) -> str | None:
-        return self._last_action_result

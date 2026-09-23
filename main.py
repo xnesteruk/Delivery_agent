@@ -1,52 +1,56 @@
 from config import SimulationConfig
 from environment import Environment
-from models import Action, ActionType, Position, Letter
+from models import Action, ActionType, Letter, Position
+
 
 def main():
     config = SimulationConfig()
 
-    letter = Letter(
-        letter_id=1,
-        destination=Position(3, 2),
-        available_time=0,
-        delivery_allowance_minutes=config.delivery_allowance_minutes,
-    )
+    letters = [
+        Letter(
+            letter_id=letter_id,
+            destination=destination,
+            available_time=0,
+            delivery_allowance_minutes=config.delivery_allowance_minutes,
+        )
+        for letter_id, destination in [
+            (1, Position(3, 2)),
+            (2, Position(3, 3)),
+            (3, Position(2, 3)),
+        ]
+    ]
 
-    environment = Environment(config, letters=[letter])
+    environment = Environment(config, letters)
 
-    observation = environment.step(
-        Action(ActionType.PICK_UP, letter_id=1)
-    )
+    actions = [
+        Action(ActionType.PICK_UP, letter_id=1),
+        Action(ActionType.PICK_UP, letter_id=2),
+        Action(ActionType.PICK_UP, letter_id=3),
 
-    print("Pickup:", observation.last_action_result)
-    print("Free capacity:", observation.remaining_capacity)
+        Action(ActionType.MOVE, destination=Position(3, 2)),
+        Action(ActionType.DELIVER, letter_id=1),
 
+        Action(ActionType.MOVE, destination=Position(3, 3)),
+        Action(ActionType.DELIVER, letter_id=2),
 
-    observation = environment.get_observation()
-    print("Before:", observation.courier_position)
+        Action(ActionType.MOVE, destination=Position(2, 3)),
+        Action(ActionType.DELIVER, letter_id=3),
+    ]
 
-    action = Action(
-        action_type=ActionType.MOVE,
-        destination=Position(3, 2),
-    )
-    observation = environment.step(action)
+    for action in actions:
+        observation = environment.step(action)
 
-    print("After:", observation.courier_position)
-    print("Time:", observation.current_time)
-    print("Result:", observation.last_action_result)
+        print(
+            f"Time: {observation.current_time:2} | "
+            f"Free capacity: {observation.remaining_capacity:2} | "
+            f"{observation.last_action_result}"
+        )
+        print("Finished:", environment.is_finished())
 
-    observation = environment.step(Action(ActionType.WAIT))
+    assert environment.is_finished()
+    assert observation.current_time == 18
+    assert observation.remaining_capacity == config.carrying_capacity
 
-    print("Wait:", observation.last_action_result)
-    print("Time after waiting:", observation.current_time)
-
-    observation = environment.step(
-        Action(ActionType.DELIVER, letter_id=1)
-    )
-
-    print("Delivery:", observation.last_action_result)
-    print("Free capacity:", observation.remaining_capacity)
-    print("Finished:", environment.is_finished())
 
 if __name__ == "__main__":
     main()

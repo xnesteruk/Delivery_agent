@@ -29,12 +29,22 @@ class DeliveryAgent:
         )
         self._known_closures: dict[tuple[int, int], int] = {}
 
-        # A short-term plan: collect this letter, then deliver it.
+        # Current delivery destination, retained between decisions.
+        self._target_letter_id: int | None = None
+
+        # A special plan: return, collect, and deliver an urgent letter.
         self._priority_letter_id: int | None = None
 
     @property
     def known_closures(self) -> frozenset[tuple[int, int]]:
         return frozenset(self._known_closures)
+
+    @property
+    def target_letter_id(self) -> int | None:
+        if self._priority_letter_id is not None:
+            return self._priority_letter_id
+
+        return self._target_letter_id
 
     def choose_action(self, observation: AgentObservation) -> Action:
         self._update_memory(observation)
@@ -51,8 +61,12 @@ class DeliveryAgent:
             if not letter.is_picked_up
         ]
 
+        # Deliver any carried letter at the current address.
         for letter in carried:
             if letter.destination == position:
+                if letter.letter_id == self._target_letter_id:
+                    self._target_letter_id = None
+
                 if letter.letter_id == self._priority_letter_id:
                     self._priority_letter_id = None
 
@@ -61,7 +75,6 @@ class DeliveryAgent:
                     letter_id=letter.letter_id,
                 )
 
-        # Continue a previously selected return-and-deliver plan.
         priority_action = self._follow_priority_plan(observation)
 
         if priority_action is not None:
@@ -78,24 +91,27 @@ class DeliveryAgent:
             )
 
             if choices:
-                _, letter, _ = min(choices, key=lambda item: item[0])
+                _, letter, _ = min(
+                    choices,
+                    key=lambda item: item[0],
+                )
+
                 return Action(
                     ActionType.PICK_UP,
                     letter_id=letter.letter_id,
                 )
 
-        choices = self._delivery_choices(
+        current_choice = self._get_current_delivery(
             position,
             carried,
             observation.current_time,
         )
 
-        if choices:
-            _, current_letter, path = min(
-                choices,
-                key=lambda item: item[0],
-            )
+        if current_choice is not None:
+            current_letter, path = current_choice
 
+            # Returning for an urgent letter remains an explicit
+            # reason to interrupt the current delivery.
             if (
                 position != observation.depot_position
                 and observation.remaining_capacity > 0
@@ -112,17 +128,63 @@ class DeliveryAgent:
                     action = self._follow_priority_plan(observation)
 
                     if action is not None:
+                        self._target_letter_id = None
                         return action
 
-            return Action(ActionType.MOVE, destination=path[0])
+            return Action(
+                ActionType.MOVE,
+                destination=path[0],
+            )
 
         if not carried and position != observation.depot_position:
-            path = self._find_path(position, observation.depot_position)
+            path = self._find_path(
+                position,
+                observation.depot_position,
+            )
 
             if path:
-                return Action(ActionType.MOVE, destination=path[0])
+                return Action(
+                    ActionType.MOVE,
+                    destination=path[0],
+                )
 
         return Action(ActionType.WAIT)
+
+    def _get_current_delivery(
+        self,
+        position: Position,
+        carried: list[LetterInfo],
+        current_time: int,
+    ) -> tuple[LetterInfo, list[Position]] | None:
+        # Keep the selected letter while a route remains available.
+        for letter in carried:
+            if letter.letter_id == self._target_letter_id:
+                path = self._find_path(position, letter.destination)
+
+                if path is not None:
+                    return letter, path
+
+                break
+
+        # The previous target is gone or currently unreachable.
+        self._target_letter_id = None
+
+        choices = self._delivery_choices(
+            position,
+            carried,
+            current_time,
+        )
+
+        if not choices:
+            return None
+
+        _, letter, path = min(
+            choices,
+            key=lambda item: item[0],
+        )
+
+        self._target_letter_id = letter.letter_id
+        return letter, path
 
     def _follow_priority_plan(
         self,
@@ -164,9 +226,11 @@ class DeliveryAgent:
         path = self._find_path(position, target)
 
         if path:
-            return Action(ActionType.MOVE, destination=path[0])
+            return Action(
+                ActionType.MOVE,
+                destination=path[0],
+            )
 
-        # New information may make the plan temporarily impossible.
         self._priority_letter_id = None
         return None
 
@@ -191,7 +255,10 @@ class DeliveryAgent:
                 priority = (0, slack, travel, letter.letter_id)
             else:
                 priority = (
-                    1, travel, letter.deadline, letter.letter_id
+                    1,
+                    travel,
+                    letter.deadline,
+                    letter.letter_id,
                 )
 
             choices.append((priority, letter, path))
@@ -211,10 +278,12 @@ class DeliveryAgent:
 
         to_depot = self._travel_time(position, depot)
         to_current = self._travel_time(
-            position, current_letter.destination
+            position,
+            current_letter.destination,
         )
         current_to_depot = self._travel_time(
-            current_letter.destination, depot
+            current_letter.destination,
+            depot,
         )
 
         if (
@@ -228,7 +297,8 @@ class DeliveryAgent:
 
         for letter in waiting:
             depot_to_letter = self._travel_time(
-                depot, letter.destination
+                depot,
+                letter.destination,
             )
 
             if depot_to_letter is None:
@@ -269,12 +339,13 @@ class DeliveryAgent:
         current_time: int,
         letters: list[LetterInfo],
     ) -> bool:
-        # Estimate the remaining deliveries using the current strategy.
         remaining = list(letters)
 
         while remaining:
             choices = self._delivery_choices(
-                position, remaining, current_time
+                position,
+                remaining,
+                current_time,
             )
 
             if not choices:

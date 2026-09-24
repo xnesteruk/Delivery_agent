@@ -32,8 +32,8 @@ class DeliveryAgent:
         # Current delivery destination, retained between decisions.
         self._target_letter_id: int | None = None
 
-        # A special plan: return, collect, and deliver an urgent letter.
-        self._priority_letter_id: int | None = None
+        # Commit to a depot visit once the joint forecast favors returning.
+        self._returning_to_depot = False
 
     @property
     def known_closures(self) -> frozenset[tuple[int, int]]:
@@ -41,9 +41,6 @@ class DeliveryAgent:
 
     @property
     def target_letter_id(self) -> int | None:
-        if self._priority_letter_id is not None:
-            return self._priority_letter_id
-
         return self._target_letter_id
 
     def choose_action(self, observation: AgentObservation) -> Action:
@@ -67,18 +64,15 @@ class DeliveryAgent:
                 if letter.letter_id == self._target_letter_id:
                     self._target_letter_id = None
 
-                if letter.letter_id == self._priority_letter_id:
-                    self._priority_letter_id = None
-
                 return Action(
                     ActionType.DELIVER,
                     letter_id=letter.letter_id,
                 )
 
-        priority_action = self._follow_priority_plan(observation)
+        return_action = self._follow_return_plan(observation)
 
-        if priority_action is not None:
-            return priority_action
+        if return_action is not None:
+            return return_action
 
         if (
             position == observation.depot_position
@@ -110,22 +104,21 @@ class DeliveryAgent:
         if current_choice is not None:
             current_letter, path = current_choice
 
-            # Returning for an urgent letter remains an explicit
-            # reason to interrupt the current delivery.
+            # Compare complete forecasts for all currently known letters.
             if (
                 position != observation.depot_position
                 and observation.remaining_capacity > 0
             ):
-                urgent = self._find_return_candidate(
+                should_return = self._should_return_to_depot(
                     observation,
                     current_letter,
                     carried,
                     waiting,
                 )
 
-                if urgent is not None:
-                    self._priority_letter_id = urgent.letter_id
-                    action = self._follow_priority_plan(observation)
+                if should_return:
+                    self._returning_to_depot = True
+                    action = self._follow_return_plan(observation)
 
                     if action is not None:
                         self._target_letter_id = None
@@ -186,52 +179,26 @@ class DeliveryAgent:
         self._target_letter_id = letter.letter_id
         return letter, path
 
-    def _follow_priority_plan(
+    def _follow_return_plan(
         self,
         observation: AgentObservation,
     ) -> Action | None:
-        if self._priority_letter_id is None:
+        if not self._returning_to_depot:
             return None
 
-        letter = next(
-            (
-                item
-                for item in observation.letters
-                if item.letter_id == self._priority_letter_id
-            ),
-            None,
+        if observation.courier_position == observation.depot_position:
+            # The usual pickup rule fills the available capacity before leaving.
+            self._returning_to_depot = False
+            return None
+
+        path = self._find_path(
+            observation.courier_position, observation.depot_position,
         )
-
-        if letter is None or letter.is_delivered:
-            self._priority_letter_id = None
-            return None
-
-        position = observation.courier_position
-
-        if letter.is_picked_up:
-            target = letter.destination
-        else:
-            if observation.remaining_capacity == 0:
-                self._priority_letter_id = None
-                return None
-
-            target = observation.depot_position
-
-            if position == target:
-                return Action(
-                    ActionType.PICK_UP,
-                    letter_id=letter.letter_id,
-                )
-
-        path = self._find_path(position, target)
-
         if path:
-            return Action(
-                ActionType.MOVE,
-                destination=path[0],
-            )
+            return Action(ActionType.MOVE, destination=path[0])
 
-        self._priority_letter_id = None
+        # A newly observed closure can invalidate the committed route.
+        self._returning_to_depot = False
         return None
 
     def _delivery_choices(
@@ -265,106 +232,106 @@ class DeliveryAgent:
 
         return choices
 
-    def _find_return_candidate(
+    def _should_return_to_depot(
         self,
         observation: AgentObservation,
         current_letter: LetterInfo,
         carried: list[LetterInfo],
         waiting: list[LetterInfo],
-    ) -> LetterInfo | None:
+    ) -> bool:
+        if not waiting or observation.remaining_capacity <= 0:
+            return False
+
+        continue_score = self._forecast_delivery_score(
+            observation, current_letter, carried, waiting, return_now=False,
+        )
+        return_score = self._forecast_delivery_score(
+            observation, current_letter, carried, waiting, return_now=True,
+        )
+        # Unknown routes are not evidence that a detour is better.
+        if continue_score is None or return_score is None:
+            return False
+
+        # Prefer fewer late letters, then fewer total late minutes.
+        # Keep the current route on a tie to avoid unnecessary interruptions.
+        return return_score < continue_score
+
+    def _forecast_delivery_score(
+        self,
+        observation: AgentObservation,
+        current_letter: LetterInfo,
+        carried: list[LetterInfo],
+        waiting: list[LetterInfo],
+        return_now: bool,
+    ) -> tuple[int, int] | None:
+        """Roll out the normal policy without changing the agent or letters.
+
+        Only observed letters and currently known closures are used. Future
+        arrivals and changes to closures are unknown. Pickup and delivery take
+        zero minutes, as in the simulation; movement consumes time.
+        """
         position = observation.courier_position
         depot = observation.depot_position
         now = observation.current_time
+        capacity = observation.remaining_capacity + len(carried)
+        bag = list(carried)
+        depot_letters = list(waiting)
+        target_id = None if return_now else current_letter.letter_id
+        returning = return_now
+        late_count = 0
+        total_lateness = 0
 
-        to_depot = self._travel_time(position, depot)
-        to_current = self._travel_time(
-            position,
-            current_letter.destination,
-        )
-        current_to_depot = self._travel_time(
-            current_letter.destination,
-            depot,
-        )
+        while bag or depot_letters:
+            # Match actual deliveries encountered on the way to any target.
+            for letter in list(bag):
+                if letter.destination == position:
+                    lateness = max(0, now - letter.deadline)
+                    late_count += int(lateness > 0)
+                    total_lateness += lateness
+                    bag.remove(letter)
+                    if target_id == letter.letter_id:
+                        target_id = None
 
-        if (
-            to_depot is None
-            or to_current is None
-            or current_to_depot is None
-        ):
-            return None
+            if position == depot:
+                returning = False
+                while len(bag) < capacity and depot_letters:
+                    choices = self._delivery_choices(position, depot_letters, now)
+                    if not choices:
+                        return None
+                    _, letter, _ = min(choices, key=lambda item: item[0])
+                    bag.append(letter)
+                    depot_letters.remove(letter)
+                # A newly picked-up letter may be addressed to the depot.
+                if any(letter.destination == position for letter in bag):
+                    continue
 
-        candidates = []
+            if not bag and not depot_letters:
+                break
 
-        for letter in waiting:
-            depot_to_letter = self._travel_time(
-                depot,
-                letter.destination,
-            )
+            if returning or not bag:
+                path = self._find_path(position, depot)
+            else:
+                target = next(
+                    (letter for letter in bag if letter.letter_id == target_id),
+                    None,
+                )
+                path = (
+                    self._find_path(position, target.destination)
+                    if target is not None else None
+                )
+                if path is None:
+                    choices = self._delivery_choices(position, bag, now)
+                    if not choices:
+                        return None
+                    _, target, path = min(choices, key=lambda item: item[0])
+                    target_id = target.letter_id
 
-            if depot_to_letter is None:
-                continue
+            if not path:
+                return None
+            position = path[0]
+            now += self._move_minutes
 
-            arrival_if_return = now + to_depot + depot_to_letter
-            arrival_if_continue = (
-                now
-                + to_current
-                + current_to_depot
-                + depot_to_letter
-            )
-
-            if not (
-                arrival_if_return <= letter.deadline
-                < arrival_if_continue
-            ):
-                continue
-
-            if not self._can_finish_on_time(
-                letter.destination,
-                arrival_if_return,
-                carried,
-            ):
-                continue
-
-            slack = letter.deadline - arrival_if_return
-            candidates.append((slack, letter.letter_id, letter))
-
-        if not candidates:
-            return None
-
-        return min(candidates, key=lambda item: item[:2])[2]
-
-    def _can_finish_on_time(
-        self,
-        position: Position,
-        current_time: int,
-        letters: list[LetterInfo],
-    ) -> bool:
-        remaining = list(letters)
-
-        while remaining:
-            choices = self._delivery_choices(
-                position,
-                remaining,
-                current_time,
-            )
-
-            if not choices:
-                return False
-
-            _, letter, path = min(
-                choices,
-                key=lambda item: item[0],
-            )
-
-            current_time += len(path) * self._move_minutes
-
-            if current_time > letter.deadline:
-                return False
-
-            position = letter.destination
-            remaining.remove(letter)
-
-        return True
+        return late_count, total_lateness
 
     def _travel_time(
         self,

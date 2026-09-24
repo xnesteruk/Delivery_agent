@@ -152,7 +152,7 @@ class DeliveryAgent:
         # Keep the selected letter while a route remains available.
         for letter in carried:
             if letter.letter_id == self._target_letter_id:
-                path = self._find_path(position, letter.destination)
+                path = self._find_path(position, letter.destination, carried)
 
                 if path is not None:
                     return letter, path
@@ -166,6 +166,7 @@ class DeliveryAgent:
             position,
             carried,
             current_time,
+            carried=carried,
         )
 
         if not choices:
@@ -193,6 +194,10 @@ class DeliveryAgent:
 
         path = self._find_path(
             observation.courier_position, observation.depot_position,
+            carried=[
+                letter for letter in observation.letters
+                if letter.is_picked_up and not letter.is_delivered
+            ],
         )
         if path:
             return Action(ActionType.MOVE, destination=path[0])
@@ -206,11 +211,12 @@ class DeliveryAgent:
         position: Position,
         letters: list[LetterInfo],
         current_time: int,
+        carried: list[LetterInfo] | None = None,
     ) -> list:
         choices = []
 
         for letter in letters:
-            path = self._find_path(position, letter.destination)
+            path = self._find_path(position, letter.destination, carried)
 
             if path is None:
                 continue
@@ -309,18 +315,18 @@ class DeliveryAgent:
                 break
 
             if returning or not bag:
-                path = self._find_path(position, depot)
+                path = self._find_path(position, depot, bag)
             else:
                 target = next(
                     (letter for letter in bag if letter.letter_id == target_id),
                     None,
                 )
                 path = (
-                    self._find_path(position, target.destination)
+                    self._find_path(position, target.destination, bag)
                     if target is not None else None
                 )
                 if path is None:
-                    choices = self._delivery_choices(position, bag, now)
+                    choices = self._delivery_choices(position, bag, now, carried=bag)
                     if not choices:
                         return None
                     _, target, path = min(choices, key=lambda item: item[0])
@@ -365,44 +371,63 @@ class DeliveryAgent:
         self,
         start: Position,
         goal: Position,
+        carried: list[LetterInfo] | None = None,
     ) -> list[Position] | None:
+        """Find a shortest route; break ties by letters delivered on the way.
+
+        BFS processes cells by distance. For equal-distance alternatives,
+        retain the predecessor yielding the most carried-letter deliveries.
+        A shortest path never revisits a cell, so each letter is counted once.
+        """
         start_cell = (start.x, start.y)
         goal_cell = (goal.x, goal.y)
 
         if not self._is_static_walkable(start_cell):
             return None
-
         if start_cell == goal_cell:
             return []
-
         if not self._is_walkable(goal_cell):
             return None
 
+        deliveries_at: dict[tuple[int, int], int] = {}
+        for letter in carried or ():
+            cell = (letter.destination.x, letter.destination.y)
+            deliveries_at[cell] = deliveries_at.get(cell, 0) + 1
+
         frontier = deque([start_cell])
         came_from = {start_cell: None}
+        distances = {start_cell: 0}
+        delivery_counts = {start_cell: 0}
 
         while frontier:
             current = frontier.popleft()
-
             if current == goal_cell:
                 return self._restore_path(came_from, goal_cell)
 
             x, y = current
-
             for neighbour in (
                 (x + 1, y),
                 (x, y + 1),
                 (x - 1, y),
                 (x, y - 1),
             ):
-                if neighbour in came_from:
-                    continue
-
                 if not self._is_walkable(neighbour):
                     continue
 
-                came_from[neighbour] = current
-                frontier.append(neighbour)
+                distance = distances[current] + 1
+                count = delivery_counts[current] + deliveries_at.get(neighbour, 0)
+                if neighbour not in distances:
+                    distances[neighbour] = distance
+                    delivery_counts[neighbour] = count
+                    came_from[neighbour] = current
+                    frontier.append(neighbour)
+                elif (
+                    distances[neighbour] == distance
+                    and count > delivery_counts[neighbour]
+                ):
+                    # All predecessors are processed before this cell is popped.
+                    delivery_counts[neighbour] = count
+                    came_from[neighbour] = current
 
         return None
 

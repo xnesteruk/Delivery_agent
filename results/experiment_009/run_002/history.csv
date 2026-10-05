@@ -1,0 +1,97 @@
+﻿step,time_before,time_after,action,x,y,remaining_capacity,message
+1,0,6,move,4,5,10,Moved successfully.
+2,6,12,move,3,5,10,Moved successfully.
+3,12,18,move,2,5,10,Moved successfully.
+4,18,24,move,1,5,10,Moved successfully.
+5,24,24,pick_up,1,5,9,Picked up letter 1.
+6,24,30,move,2,5,9,Moved successfully.
+7,30,36,move,3,5,9,Moved successfully.
+8,36,42,move,3,4,9,Moved successfully.
+9,42,48,move,3,3,9,Moved successfully.
+10,48,54,move,3,2,9,Moved successfully.
+11,54,54,deliver,3,2,10,Delivered letter 1.
+12,54,60,move,4,2,10,Moved successfully.
+13,60,66,move,5,2,10,Moved successfully.
+14,66,72,move,6,2,10,Moved successfully.
+15,72,78,move,7,2,10,Moved successfully.
+16,78,84,move,7,3,10,Moved successfully.
+17,84,90,move,8,3,10,Moved successfully.
+18,90,96,move,9,3,10,Moved successfully.
+19,96,102,move,9,4,10,Moved successfully.
+20,102,108,move,9,5,10,Moved successfully.
+21,108,114,move,9,6,10,Moved successfully.
+22,114,120,move,9,7,10,Moved successfully.
+23,120,126,move,9,8,10,Moved successfully.
+24,126,126,pick_up,9,8,9,Picked up letter 6.
+25,126,132,move,8,8,9,Moved successfully.
+26,132,138,move,8,7,9,Moved successfully.
+27,138,144,move,8,6,9,Moved successfully.
+28,144,150,move,8,5,9,Moved successfully.
+29,150,156,move,8,4,9,Moved successfully.
+30,156,156,deliver,8,4,10,Delivered letter 6.
+31,156,162,move,7,4,10,Moved successfully.
+32,162,162,pick_up,7,4,9,Picked up letter 2.
+33,162,162,pick_up,7,4,8,Picked up letter 7.
+34,162,162,pick_up,7,4,7,Picked up letter 9.
+35,162,162,pick_up,7,4,6,Picked up letter 8.
+36,162,168,move,6,4,6,Moved successfully.
+37,168,174,move,5,4,6,Moved successfully.
+38,174,180,move,4,4,6,Moved successfully.
+39,180,186,move,3,4,6,Moved successfully.
+40,186,192,move,3,3,6,Moved successfully.
+41,192,192,deliver,3,3,7,Delivered letter 7.
+42,192,198,move,3,2,7,Moved successfully.
+43,198,204,move,2,2,7,Moved successfully.
+44,204,210,move,3,2,7,Moved successfully.
+45,210,216,move,4,2,7,Moved successfully.
+46,216,222,move,4,1,7,Moved successfully.
+47,222,228,move,4,0,7,Moved successfully.
+48,228,228,deliver,4,0,8,Delivered letter 8.
+49,228,234,move,4,1,8,Moved successfully.
+50,234,240,move,3,1,8,Moved successfully.
+51,240,246,move,2,1,8,Moved successfully.
+52,246,252,move,1,1,8,Moved successfully.
+53,252,252,deliver,1,1,9,Delivered letter 2.
+54,252,258,move,1,2,9,Moved successfully.
+55,258,264,move,1,3,9,Moved successfully.
+56,264,270,move,1,4,9,Moved successfully.
+57,270,276,move,1,5,9,Moved successfully.
+58,276,276,pick_up,1,5,8,Picked up letter 3.
+59,276,276,pick_up,1,5,7,Picked up letter 10.
+60,276,282,move,2,5,7,Moved successfully.
+61,282,288,move,3,5,7,Moved successfully.
+62,288,294,move,4,5,7,Moved successfully.
+63,294,300,move,5,5,7,Moved successfully.
+64,300,306,move,5,6,7,Moved successfully.
+65,306,306,deliver,5,6,8,Delivered letter 10.
+66,306,312,move,5,7,8,Moved successfully.
+67,312,318,move,5,8,8,Moved successfully.
+68,318,324,move,5,9,8,Moved successfully.
+69,324,324,deliver,5,9,9,Delivered letter 9.
+70,324,330,move,5,8,9,Moved successfully.
+71,330,336,move,5,7,9,Moved successfully.
+72,336,342,move,5,6,9,Moved successfully.
+73,342,348,move,5,5,9,Moved successfully.
+74,348,354,move,4,5,9,Moved successfully.
+75,354,360,move,4,4,9,Moved successfully.
+76,360,360,deliver,4,4,10,Delivered letter 3.
+77,360,366,move,5,4,10,Moved successfully.
+78,366,372,move,6,4,10,Moved successfully.
+79,372,378,move,7,4,10,Moved successfully.
+80,378,378,pick_up,7,4,9,Picked up letter 4.
+81,378,384,move,8,4,9,Moved successfully.
+82,384,390,move,9,4,9,Moved successfully.
+83,390,396,move,9,5,9,Moved successfully.
+84,396,402,move,9,6,9,Moved successfully.
+85,402,408,move,9,7,9,Moved successfully.
+86,408,414,move,9,8,9,Moved successfully.
+87,414,414,pick_up,9,8,8,Picked up letter 5.
+88,414,420,move,9,7,8,Moved successfully.
+89,420,426,move,9,6,8,Moved successfully.
+90,426,432,move,9,5,8,Moved successfully.
+91,432,438,move,9,4,8,Moved successfully.
+92,438,438,deliver,9,4,9,Delivered letter 5.
+93,438,444,move,9,3,9,Moved successfully.
+94,444,450,move,9,2,9,Moved successfully.
+95,450,456,move,9,1,9,Moved successfully.
+96,456,456,deliver,9,1,10,Delivered letter 4.

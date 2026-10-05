@@ -1,0 +1,58 @@
+{
+  "preset": "default.json",
+  "master_seed": 1,
+  "run_count": 20,
+  "created_at_utc": "2026-10-04T16:57:55.360004+00:00",
+  "run_seeds": [
+    7449397586485381229,
+    9600136432376373483,
+    14527117395773360309,
+    10553034322367798443,
+    6487223768678365598,
+    10260405257548746757,
+    8087892392234143857,
+    7950807758702756578,
+    5944037044742480889,
+    16377255539206594006,
+    7554532742994093759,
+    237849526458075399,
+    4951327609057158025,
+    11148358538932684038,
+    11858545879905065995,
+    1626025212625598053,
+    13702831732546474677,
+    2415161394805135645,
+    17859398112312607140,
+    9817916041742262696
+  ],
+  "max_steps": 2000,
+  "closure_memory_minutes": 12,
+  "python_version": "3.14.7",
+  "config": {
+    "map_width": 10,
+    "map_height": 10,
+    "carrying_capacity": 10,
+    "delivery_allowance_minutes": 120,
+    "seed": 1
+  },
+  "fixed_rules": {
+    "move_minutes": 6,
+    "cell_distance_meters": 500,
+    "deadline_starts_at": "pickup",
+    "post_capacity": "unlimited",
+    "on_time_rate_denominator": "all_scenario_letters"
+  },
+  "generation": {
+    "letter_count": 10,
+    "building_count": 10,
+    "closure_count": 4,
+    "arrival_window_minutes": 200,
+    "min_closure_minutes": 12,
+    "max_closure_minutes": 36,
+    "closure_window_minutes": 80
+  },
+  "pickup_posts": {
+    "count": 3
+  },
+  "blocked_cells": []
+}

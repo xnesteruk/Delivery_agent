@@ -1,0 +1,188 @@
+{
+  "seed": 6487223768678365598,
+  "pickup_posts": [
+    [
+      5,
+      4
+    ],
+    [
+      7,
+      9
+    ],
+    [
+      8,
+      7
+    ]
+  ],
+  "arrivals_seed": 13481283597355070830,
+  "letters_seed": 7325602000249861513,
+  "closures_seed": 18145016607995180227,
+  "letters": [
+    {
+      "letter_id": 1,
+      "destination": [
+        4,
+        9
+      ],
+      "available_time": 0,
+      "delivery_allowance_minutes": 120
+    },
+    {
+      "letter_id": 2,
+      "destination": [
+        5,
+        6
+      ],
+      "available_time": 128,
+      "delivery_allowance_minutes": 120
+    },
+    {
+      "letter_id": 3,
+      "destination": [
+        9,
+        5
+      ],
+      "available_time": 86,
+      "delivery_allowance_minutes": 120
+    },
+    {
+      "letter_id": 4,
+      "destination": [
+        8,
+        8
+      ],
+      "available_time": 65,
+      "delivery_allowance_minutes": 120
+    },
+    {
+      "letter_id": 5,
+      "destination": [
+        2,
+        2
+      ],
+      "available_time": 165,
+      "delivery_allowance_minutes": 120
+    },
+    {
+      "letter_id": 6,
+      "destination": [
+        9,
+        3
+      ],
+      "available_time": 187,
+      "delivery_allowance_minutes": 120
+    },
+    {
+      "letter_id": 7,
+      "destination": [
+        5,
+        6
+      ],
+      "available_time": 195,
+      "delivery_allowance_minutes": 120
+    },
+    {
+      "letter_id": 8,
+      "destination": [
+        1,
+        4
+      ],
+      "available_time": 140,
+      "delivery_allowance_minutes": 120
+    },
+    {
+      "letter_id": 9,
+      "destination": [
+        9,
+        7
+      ],
+      "available_time": 158,
+      "delivery_allowance_minutes": 120
+    },
+    {
+      "letter_id": 10,
+      "destination": [
+        4,
+        4
+      ],
+      "available_time": 119,
+      "delivery_allowance_minutes": 120
+    }
+  ],
+  "closures": [
+    {
+      "cell": [
+        0,
+        8
+      ],
+      "start_minute": 23,
+      "end_minute": 42
+    },
+    {
+      "cell": [
+        2,
+        0
+      ],
+      "start_minute": 24,
+      "end_minute": 36
+    },
+    {
+      "cell": [
+        7,
+        7
+      ],
+      "start_minute": 62,
+      "end_minute": 87
+    },
+    {
+      "cell": [
+        7,
+        8
+      ],
+      "start_minute": 49,
+      "end_minute": 73
+    }
+  ],
+  "blocked_cells": [
+    [
+      0,
+      1
+    ],
+    [
+      2,
+      1
+    ],
+    [
+      2,
+      6
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      3,
+      7
+    ],
+    [
+      5,
+      0
+    ],
+    [
+      6,
+      0
+    ],
+    [
+      8,
+      1
+    ],
+    [
+      8,
+      6
+    ],
+    [
+      9,
+      2
+    ]
+  ]
+}

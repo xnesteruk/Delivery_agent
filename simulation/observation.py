@@ -14,3 +14,4 @@ class AgentObservation:
     direction: Direction
     vision: VisionObservation
     last_action_result: str | None = None
+    pickup_posts: tuple[Position, ...] = ()

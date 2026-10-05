@@ -1,0 +1,297 @@
+{
+  "seed": 946238504589631718,
+  "pickup_posts": [
+    [
+      4,
+      0
+    ],
+    [
+      9,
+      3
+    ],
+    [
+      10,
+      9
+    ]
+  ],
+  "arrivals_seed": 11427361846605892608,
+  "letters_seed": 11735905449930302375,
+  "closures_seed": 9776101590031435612,
+  "letters": [
+    {
+      "letter_id": 1,
+      "destination": [
+        0,
+        13
+      ],
+      "available_time": 0,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 2,
+      "destination": [
+        6,
+        7
+      ],
+      "available_time": 51,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 3,
+      "destination": [
+        3,
+        7
+      ],
+      "available_time": 36,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 4,
+      "destination": [
+        9,
+        8
+      ],
+      "available_time": 7,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 5,
+      "destination": [
+        10,
+        3
+      ],
+      "available_time": 38,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 6,
+      "destination": [
+        9,
+        12
+      ],
+      "available_time": 54,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 7,
+      "destination": [
+        10,
+        5
+      ],
+      "available_time": 18,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 8,
+      "destination": [
+        8,
+        1
+      ],
+      "available_time": 1,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 9,
+      "destination": [
+        13,
+        4
+      ],
+      "available_time": 8,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 10,
+      "destination": [
+        12,
+        0
+      ],
+      "available_time": 37,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 11,
+      "destination": [
+        4,
+        4
+      ],
+      "available_time": 4,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 12,
+      "destination": [
+        1,
+        7
+      ],
+      "available_time": 55,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 13,
+      "destination": [
+        3,
+        8
+      ],
+      "available_time": 58,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 14,
+      "destination": [
+        0,
+        4
+      ],
+      "available_time": 33,
+      "delivery_allowance_minutes": 160
+    },
+    {
+      "letter_id": 15,
+      "destination": [
+        13,
+        13
+      ],
+      "available_time": 20,
+      "delivery_allowance_minutes": 160
+    }
+  ],
+  "closures": [
+    {
+      "cell": [
+        0,
+        10
+      ],
+      "start_minute": 113,
+      "end_minute": 140
+    },
+    {
+      "cell": [
+        5,
+        9
+      ],
+      "start_minute": 18,
+      "end_minute": 37
+    },
+    {
+      "cell": [
+        4,
+        14
+      ],
+      "start_minute": 107,
+      "end_minute": 143
+    },
+    {
+      "cell": [
+        8,
+        3
+      ],
+      "start_minute": 42,
+      "end_minute": 72
+    },
+    {
+      "cell": [
+        7,
+        0
+      ],
+      "start_minute": 117,
+      "end_minute": 132
+    },
+    {
+      "cell": [
+        14,
+        9
+      ],
+      "start_minute": 65,
+      "end_minute": 91
+    }
+  ],
+  "blocked_cells": [
+    [
+      0,
+      6
+    ],
+    [
+      0,
+      8
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      4,
+      6
+    ],
+    [
+      4,
+      13
+    ],
+    [
+      5,
+      1
+    ],
+    [
+      5,
+      5
+    ],
+    [
+      6,
+      9
+    ],
+    [
+      6,
+      12
+    ],
+    [
+      7,
+      8
+    ],
+    [
+      8,
+      7
+    ],
+    [
+      11,
+      3
+    ],
+    [
+      11,
+      14
+    ],
+    [
+      12,
+      5
+    ],
+    [
+      12,
+      8
+    ],
+    [
+      12,
+      11
+    ],
+    [
+      12,
+      12
+    ],
+    [
+      12,
+      13
+    ],
+    [
+      13,
+      2
+    ],
+    [
+      13,
+      5
+    ],
+    [
+      14,
+      4
+    ],
+    [
+      14,
+      11
+    ]
+  ]
+}

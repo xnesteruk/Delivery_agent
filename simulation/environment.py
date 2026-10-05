@@ -1,3 +1,5 @@
+from random import Random
+
 from simulation.config import SimulationConfig
 from simulation.models import (
     Action,
@@ -21,6 +23,8 @@ class Environment:
         closures: set[tuple[int, int]] | None = None,
         initial_direction: Direction = Direction.EAST,
         scheduled_closures: list[RoadClosure] | None = None,
+        pickup_posts: tuple[tuple[int, int], ...] | None = None,
+        arrivals_seed: int = 0,
     ):
         self._config = config
         self._current_time = 0
@@ -66,6 +70,14 @@ class Environment:
             capacity=config.carrying_capacity,
         )
 
+        cells = tuple(pickup_posts) if pickup_posts is not None else (config.depot_position,)
+        if not cells or len(set(cells)) != len(cells):
+            raise ValueError("Pickup posts must be nonempty and unique.")
+        for cell in cells:
+            if not self._is_inside_map(Position(*cell)) or cell in self._blocked_cells | all_closure_cells:
+                raise ValueError("Pickup post must be an unblocked map cell.")
+        self._pickup_posts = tuple(Position(*cell) for cell in cells)
+        self._arrivals_random = Random(arrivals_seed)
         self._letters = {}
 
         for letter in letters:
@@ -88,7 +100,21 @@ class Environment:
             if letter.is_picked_up:
                 raise ValueError("Simulation requires uncollected letters.")
 
+            letter.defer_appearance()
             self._letters[letter.letter_id] = letter
+        self._pending = sorted(letters, key=lambda letter: (letter.scheduled_time, letter.letter_id))
+        self._admit_letters()
+
+    def _admit_letters(self) -> None:
+        while self._pending and self._pending[0].scheduled_time <= self._current_time:
+            post = self._arrivals_random.choice(self._pickup_posts)
+            self._pending.pop(0).appear(self._current_time, post)
+
+    def _advance_time(self, minutes: int) -> None:
+        # Admit at the actual minute, including arrivals during a move.
+        for _ in range(minutes):
+            self._current_time += 1
+            self._admit_letters()
 
     @property
     def current_time(self) -> int:
@@ -121,7 +147,7 @@ class Environment:
         available_letters = tuple(
             LetterInfo(letter)
             for letter in self._letters.values()
-            if letter.available_time <= self._current_time
+            if letter.available_time is not None and letter.available_time <= self._current_time
         )
 
         return AgentObservation(
@@ -136,6 +162,7 @@ class Environment:
             direction=self._direction,
             vision=vision,
             last_action_result=self._last_action_result,
+            pickup_posts=tuple(Position(p.x, p.y) for p in self._pickup_posts),
         )
 
     def is_finished(self) -> bool:
@@ -187,23 +214,17 @@ class Environment:
             return
 
         if cell in self._active_closures():
-            self._current_time += 1
+            self._advance_time(1)
             self._last_action_result = (
                 "Movement failed: road is temporarily closed."
             )
             return
 
         self._courier.position = destination
-        self._current_time += self._config.move_minutes
+        self._advance_time(self._config.move_minutes)
         self._last_action_result = "Moved successfully."
 
     def _pick_up(self, letter_id: int) -> None:
-        if self._courier.position != self._depot_position:
-            self._last_action_result = (
-                "Pickup failed: courier must be at the depot."
-            )
-            return
-
         letter = self._letters.get(letter_id)
 
         if letter is None:
@@ -212,10 +233,14 @@ class Environment:
             )
             return
 
-        if letter.available_time > self._current_time:
+        if letter.available_time is None or letter.available_time > self._current_time:
             self._last_action_result = (
                 "Pickup failed: letter is not available yet."
             )
+            return
+
+        if self._courier.position != letter.pickup_position:
+            self._last_action_result = "Pickup failed: courier must be at the letter's post."
             return
 
         if letter.is_picked_up:
@@ -257,5 +282,5 @@ class Environment:
         self._last_action_result = f"Delivered letter {letter_id}."
 
     def _wait(self) -> None:
-        self._current_time += 1
+        self._advance_time(1)
         self._last_action_result = "Waited for 1 minute."

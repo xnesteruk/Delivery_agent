@@ -4,13 +4,22 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="27248883-3bba-4601-9af0-370174815d67" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/delivery-agent.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+    <list default="true" id="7cd443cc-b530-4bcf-8e30-54be139222ce" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/delivery-agent.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/delivery-agent.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/delivery_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/agents/delivery_agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_dynamic_closures.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_incoming_letters.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_memory_expiry.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_sensor_memory.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_urgent_return.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/default.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simulation/environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulation/environment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simulation/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulation/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simulation/observation.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulation/observation.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,188 +27,153 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="9" />
+    <option name="cachedIndexableFilesCount" value="230" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;YarosNesteruk&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/xnesteruk/Delivery_agent.git&quot;,
+    &quot;accountId&quot;: &quot;85e2f178-a6e8-446c-822e-8ae36676b3c6&quot;
+  }
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000527003534712" />
-      <entry key="MS500" value="1.4120976404652448" />
-      <entry key="S2" value="3.628595328196902" />
-      <entry key="S5" value="4.859275372729089" />
-      <entry key="S10" value="5.391433179301063" />
-      <entry key="S30" value="5.787981717262533" />
-      <entry key="S60" value="5.892800628468915" />
-      <entry key="M2" value="5.946099276525253" />
-      <entry key="M5" value="5.978367011226211" />
-      <entry key="M10" value="5.9891713513163705" />
-      <entry key="M15" value="5.992778197120387" />
-      <entry key="M30" value="5.996387745980299" />
-      <entry key="H1" value="5.998193534713616" />
-      <entry key="H2" value="5.999096682771223" />
-      <entry key="H4" value="5.99954832023716" />
-      <entry key="D1" value="5.9999247171020675" />
-      <entry key="W1" value="5.999989245228355" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.000000000000843" />
+      <entry key="S5" value="1.0000224364308359" />
+      <entry key="S10" value="1.0066988373240924" />
+      <entry key="S30" value="1.3198828117030703" />
+      <entry key="S60" value="2.267884454452866" />
+      <entry key="M2" value="4.7495376686662025" />
+      <entry key="M5" value="9.952168879706317" />
+      <entry key="M10" value="17.54262551331481" />
+      <entry key="M15" value="24.893582050906293" />
+      <entry key="M30" value="40.270346730556774" />
+      <entry key="H1" value="57.482376988880276" />
+      <entry key="H2" value="94.98088863607073" />
+      <entry key="H4" value="173.64823850419148" />
+      <entry key="D1" value="380.1789031126112" />
+      <entry key="W1" value="445.7315299592393" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="0.0" />
-      <entry key="S5" value="0.0" />
-      <entry key="S10" value="0.0" />
-      <entry key="S30" value="0.0" />
-      <entry key="S60" value="0.0" />
-      <entry key="M2" value="0.0" />
-      <entry key="M5" value="0.0" />
-      <entry key="M10" value="0.0" />
-      <entry key="M15" value="0.0" />
-      <entry key="M30" value="0.0" />
-      <entry key="H1" value="0.0" />
-      <entry key="H2" value="0.0" />
-      <entry key="H4" value="0.0" />
-      <entry key="D1" value="0.0" />
-      <entry key="W1" value="0.0" />
+      <entry key="MS500" value="4.8663993193648635E-155" />
+      <entry key="S2" value="2.641203935259584E-39" />
+      <entry key="S5" value="3.70442472546729E-16" />
+      <entry key="S10" value="1.924688215131815E-8" />
+      <entry key="S30" value="0.0026799095049693943" />
+      <entry key="S60" value="0.05176784238279004" />
+      <entry key="M2" value="0.22752547633790388" />
+      <entry key="M5" value="0.5531106399754842" />
+      <entry key="M10" value="0.7437140848306454" />
+      <entry key="M15" value="0.8208629819936062" />
+      <entry key="M30" value="0.9060148906025804" />
+      <entry key="H1" value="0.9518481447177277" />
+      <entry key="H2" value="0.9756270520633015" />
+      <entry key="H4" value="0.9877383520261334" />
+      <entry key="D1" value="0.9979458722487382" />
+      <entry key="W1" value="0.9997062945163001" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.5548356748588225" />
-      <entry key="MS500" value="1.2961415175376236" />
-      <entry key="S2" value="3.5884994795694056" />
-      <entry key="S5" value="4.840488768211648" />
-      <entry key="S10" value="5.381418213418639" />
-      <entry key="S30" value="5.784485783162099" />
-      <entry key="S60" value="5.891031614275606" />
-      <entry key="M2" value="5.945209401475253" />
-      <entry key="M5" value="5.978009759079067" />
-      <entry key="M10" value="5.988992507060414" />
-      <entry key="M15" value="5.99265891904508" />
-      <entry key="M30" value="5.996328082635354" />
-      <entry key="H1" value="5.998163696960262" />
-      <entry key="H2" value="5.9990817623738195" />
-      <entry key="H4" value="5.999540859658211" />
-      <entry key="D1" value="5.999923473619425" />
-      <entry key="W1" value="5.999989067586686" />
+      <entry key="MS100" value="1.179121495269587E-4" />
+      <entry key="MS500" value="0.1637991754822954" />
+      <entry key="S2" value="0.6361769472990269" />
+      <entry key="S5" value="0.8345311255761512" />
+      <entry key="S10" value="0.9201240783281384" />
+      <entry key="S30" value="1.291039671317195" />
+      <entry key="S60" value="2.2971936466716913" />
+      <entry key="M2" value="4.953293579437764" />
+      <entry key="M5" value="10.485326613696285" />
+      <entry key="M10" value="18.272988700674112" />
+      <entry key="M15" value="25.704482167028868" />
+      <entry key="M30" value="41.170580780734106" />
+      <entry key="H1" value="58.43098691321968" />
+      <entry key="H2" value="95.95471237692358" />
+      <entry key="H4" value="174.63495768945137" />
+      <entry key="D1" value="381.1766392109285" />
+      <entry key="W1" value="446.73120464810137" />
     </decayedShown>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5,
-  "fromUser": false
-}]]></component>
-  <component name="ProjectId" id="3Jb5Q1p1kqk1eEqeTxECpbQNGAF" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3K3j8dA4qYGSGIRxBjDQcqQWFiu" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
-    "junie.onboarding.icon.badge.shown": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
-    "to.speed.mode.migration.done": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python File (Portable).config.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_agent_integration.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python.analyze_results.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/Desktop/FIIT/3_semester/UI_B/Delivery_agent&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RunManager">
-    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
-      <module name="delivery-agent" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="DEBUG_JUST_MY_CODE" value="false" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="Autodetect">
-      <module name="delivery-agent" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="DEBUG_JUST_MY_CODE" value="false" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="Doctests">
-      <module name="delivery-agent" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="DEBUG_JUST_MY_CODE" value="false" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="FOLDER_NAME" value="" />
-      <option name="TEST_TYPE" value="TEST_SCRIPT" />
-      <option name="PATTERN" value="" />
-      <option name="USE_PATTERN" value="false" />
-      <method v="2" />
-    </configuration>
-  </component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-6fa658e1df1a-5bd6d13a2a75-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-262.8665.369" />
+        <option value="bundled-jdk-30f59d01ecdd-63390994e64e-intellij.indexing.shared.core-IU-262.8665.337" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.8665.337" />
       </set>
     </attachedChunks>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="27248883-3bba-4601-9af0-370174815d67" name="Changes" comment="" />
-      <created>1789916908243</created>
+      <changelist id="7cd443cc-b530-4bcf-8e30-54be139222ce" name="Changes" comment="" />
+      <created>1790792987994</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1789916908243</updated>
-      <workItem from="1789916909239" duration="440000" />
+      <updated>1790792987994</updated>
+      <workItem from="1790792989018" duration="9430000" />
+      <workItem from="1790856866114" duration="4398000" />
+      <workItem from="1790864632895" duration="144000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Delivery_agent_f$analyze_results.coverage" NAME="analyze_results Coverage Results" MODIFIED="1790794653811" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Delivery_agent_f$.coverage" NAME=" Coverage Results" MODIFIED="1790795130375" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Delivery_agent_f$main.coverage" NAME="main Coverage Results" MODIFIED="1790858176100" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

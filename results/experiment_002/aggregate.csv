@@ -1,0 +1,9 @@
+﻿metric,mean,stddev
+on_time_rate,0.7866666666666666,0.08812537586498587
+awaiting_delivery_letters,0,0.0
+not_yet_appeared_letters,0,0.0
+on_time_letters,11.8,1.3218806379747876
+total_lateness_minutes,233.2,157.46331235193202
+steps,147.65,19.054699655134122
+simulation_minutes,705.9,114.32819793080473
+execution_seconds,0.6439014349889476,0.1078225154783907

@@ -1,0 +1,25 @@
+{
+  "run_count": 20,
+  "max_steps": 2000,
+  "closure_memory_minutes": 12,
+  "config": {
+    "map_width": 15,
+    "map_height": 15,
+    "carrying_capacity": 10,
+    "delivery_allowance_minutes": 160,
+    "seed": 18
+  },
+  "generation": {
+    "letter_count": 15,
+    "building_count": 22,
+    "closure_count": 6,
+    "arrival_window_minutes": 500,
+    "min_closure_minutes": 12,
+    "max_closure_minutes": 36,
+    "closure_window_minutes": 420
+  },
+  "blocked_cells": [],
+  "pickup_posts": {
+    "count": 3
+  }
+}

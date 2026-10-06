@@ -1,4 +1,3 @@
-"""Plot repeated-run results for a single experiment batch."""
 import argparse
 import csv
 import json
@@ -10,7 +9,7 @@ import matplotlib.pyplot as plt
 
 
 def results(folder: Path) -> None:
-    """Save an on-time letter count and simulation-time plot."""
+    """Generate an on-time letter count and simulation-time plot"""
     folder = Path(folder)
 
     with (folder / "runs.csv").open(encoding="utf-8-sig") as file:

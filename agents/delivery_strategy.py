@@ -1,4 +1,3 @@
-"""Pluggable policies for selecting and forecasting letter deliveries."""
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 
@@ -8,10 +7,10 @@ PathFinder = Callable[[Position, Position, list[LetterInfo] | None], list[Positi
 
 
 class DeliveryStrategy(ABC):
-    """Interface for an agent's delivery-order policy."""
+    """Interface for an agents' delivery-order strategy"""
 
     def select_stop(self, observation, move_minutes, find_path, known_closures):
-        """abstract method, should be implemented """
+        """abstract method, should be overriden """
         return None
 
     @abstractmethod
@@ -39,7 +38,7 @@ class DeliveryStrategy(ABC):
 
 
 class DeadlineAwareStrategy(DeliveryStrategy):
-    """Choose a first delivery, then continue by earliest feasible slack."""
+    """Choose a first delivery, then continue by earliest feasible slack """
 
     @staticmethod
     def _delivery_choices(position, letters, current_time, move_minutes, find_path, carried=None):
@@ -49,6 +48,7 @@ class DeadlineAwareStrategy(DeliveryStrategy):
             if path is None:
                 continue
             travel = len(path) * move_minutes
+            #slack - how much time will still remain before the deadline after reaching the destinatio
             slack = letter.deadline - current_time - travel
             if slack >= 0:
                 priority = (0, slack, travel, letter.letter_id)

@@ -39,12 +39,19 @@ class PickupTests(unittest.TestCase):
         self.assertEqual([l.available_time for l in letters], [2, 3, 4])
         self.assertTrue(all(l.deadline is None for l in letters))
 
-    def test_delivery_at_post_needs_no_departure(self):
-        letters = [Letter(i, Position(2, 2), 0, 120) for i in range(15)]
-        env = Environment(SimulationConfig(), letters, pickup_posts=((2, 2),))
-        result = Simulation(env, DeliveryAgent(5, 5), 40).run()
-        self.assertTrue(result.finished)
-        self.assertEqual(result.simulation_minutes, 0)
+    def test_delivery_addresses_are_not_pickup_posts(self):
+        config = SimulationConfig(map_width=10, map_height=10)
+        generator = ScenarioGenerator(config, set())
+
+        scenario = generator.generate(
+            seed=31,
+            closure_window_minutes=120,
+            post_count=3,
+            letter_count=15,
+        )
+
+        for letter in scenario.letters:
+            self.assertNotIn(letter.destination, scenario.pickup_posts)
 
     def test_reproducible_random_posts_and_complete_delivery(self):
         config = SimulationConfig(map_width=10, map_height=10)

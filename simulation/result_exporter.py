@@ -7,7 +7,7 @@ from simulation.runner import SimulationResult
 class ResultExporter:
     @staticmethod
     def save_letters(letters, path: str | Path) -> None:
-        """Export all Letter objects, including those not delivered."""
+        """Export all Letter objects"""
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         fieldnames = [

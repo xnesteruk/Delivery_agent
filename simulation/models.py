@@ -297,7 +297,7 @@ class LetterInfo:
         return self._allowance
 
     def after_pickup(self, current_time: int) -> "LetterInfo":
-        """Forecast pickup without changing this observation or the real letter."""
+        """Simulates picking up a letter without changing the real letter"""
         projected = copy(self)
         projected._is_picked_up = True
         projected._deadline = current_time + self._allowance

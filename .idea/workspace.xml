@@ -6,12 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="7cd443cc-b530-4bcf-8e30-54be139222ce" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/agents/delivery_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/agents/delivery_agent.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/agents/delivery_strategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/agents/delivery_strategy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/agents/lookahead_strategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/agents/lookahead_strategy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simulation/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulation/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simulation/runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulation/runner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/scenario_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/scenario_generator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/img.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img_2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_pickup_posts.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_pickup_posts.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,61 +43,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.000676322982476" />
-      <entry key="MS500" value="1.2322901685681067" />
-      <entry key="S2" value="1.6957882431088094" />
-      <entry key="S5" value="1.9828585082137573" />
-      <entry key="S10" value="2.9099546179770317" />
-      <entry key="S30" value="9.227125673208329" />
-      <entry key="S60" value="15.188726434589421" />
-      <entry key="M2" value="20.248221565381037" />
-      <entry key="M5" value="24.46242305326862" />
-      <entry key="M10" value="26.157909432355446" />
-      <entry key="M15" value="26.831257317651662" />
-      <entry key="M30" value="28.21016877652041" />
-      <entry key="H1" value="30.651690671032586" />
-      <entry key="H2" value="34.151290241317675" />
-      <entry key="H4" value="50.30463342622453" />
-      <entry key="D1" value="330.1660350674055" />
-      <entry key="W1" value="547.8332054505728" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0000000000000895" />
+      <entry key="S2" value="1.0005468754805473" />
+      <entry key="S5" value="1.0495627483450236" />
+      <entry key="S10" value="1.2226269263701575" />
+      <entry key="S30" value="1.6060743394108958" />
+      <entry key="S60" value="1.7785098254649716" />
+      <entry key="M2" value="1.8858080089550706" />
+      <entry key="M5" value="2.335824084883674" />
+      <entry key="M10" value="5.775005380640573" />
+      <entry key="M15" value="11.9499618700591" />
+      <entry key="M30" value="30.519696454357973" />
+      <entry key="H1" value="52.341114899547804" />
+      <entry key="H2" value="70.90832922552951" />
+      <entry key="H4" value="95.04692256876051" />
+      <entry key="D1" value="379.4440783387457" />
+      <entry key="W1" value="604.620242765726" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="0.0" />
-      <entry key="S5" value="0.0" />
-      <entry key="S10" value="0.0" />
-      <entry key="S30" value="0.0" />
-      <entry key="S60" value="1.573518980241836E-287" />
-      <entry key="M2" value="5.606416947277078E-144" />
-      <entry key="M5" value="7.586271773328502E-58" />
-      <entry key="M10" value="3.896093837319305E-29" />
-      <entry key="M15" value="1.4523517240456345E-19" />
-      <entry key="M30" value="5.595980792586786E-10" />
-      <entry key="H1" value="3.744262769990315E-5" />
-      <entry key="H2" value="0.010253487278118988" />
-      <entry key="H4" value="0.17368481281736534" />
-      <entry key="D1" value="1.8631830989508282" />
-      <entry key="W1" value="2.80254599436102" />
+      <entry key="MS500" value="2.071944235348058E-181" />
+      <entry key="S2" value="6.746748414110868E-46" />
+      <entry key="S5" value="8.543538999865786E-19" />
+      <entry key="S10" value="9.243126635433372E-10" />
+      <entry key="S30" value="9.741061853908697E-4" />
+      <entry key="S60" value="0.031210674221984855" />
+      <entry key="M2" value="0.1766654301836804" />
+      <entry key="M5" value="0.49987409411715134" />
+      <entry key="M10" value="0.7070177466776568" />
+      <entry key="M15" value="0.793633899347702" />
+      <entry key="M30" value="0.8908613245803849" />
+      <entry key="H1" value="0.9438745369043362" />
+      <entry key="H2" value="0.9790217613099962" />
+      <entry key="H4" value="1.1342027090716813" />
+      <entry key="D1" value="2.8128520922828595" />
+      <entry key="W1" value="3.791788261325682" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.6931558787885409" />
-      <entry key="MS500" value="1.1560404630853698" />
-      <entry key="S2" value="1.6734938932993024" />
-      <entry key="S5" value="1.973111628327087" />
-      <entry key="S10" value="2.9038250419760296" />
-      <entry key="S30" value="9.222246736869678" />
-      <entry key="S60" value="15.18488998144182" />
-      <entry key="M2" value="20.245676244148488" />
-      <entry key="M5" value="24.461183572429725" />
-      <entry key="M10" value="26.15724281303398" />
-      <entry key="M15" value="26.830798840382197" />
-      <entry key="M30" value="28.20992203556023" />
-      <entry key="H1" value="30.651588812971728" />
-      <entry key="H2" value="34.16145312898058" />
-      <entry key="H4" value="50.47816546591188" />
-      <entry key="D1" value="332.0289811946374" />
-      <entry key="W1" value="550.6356990410659" />
+      <entry key="MS100" value="0.8526348917679567" />
+      <entry key="MS500" value="0.9686181892267133" />
+      <entry key="S2" value="0.9926015245521045" />
+      <entry key="S5" value="1.0461668096002879" />
+      <entry key="S10" value="1.2205561013326856" />
+      <entry key="S30" value="1.606026814657098" />
+      <entry key="S60" value="1.808258855954133" />
+      <entry key="M2" value="2.059566747330216" />
+      <entry key="M5" value="2.832578258113819" />
+      <entry key="M10" value="6.479743917143278" />
+      <entry key="M15" value="12.74179038072787" />
+      <entry key="M30" value="31.409390902246756" />
+      <entry key="H1" value="53.28428002194999" />
+      <entry key="H2" value="71.88693821461294" />
+      <entry key="H4" value="96.18081286333965" />
+      <entry key="D1" value="382.2566679571906" />
+      <entry key="W1" value="608.4119742702193" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -142,8 +143,8 @@
     ]
   }
 }]]></component>
-  <component name="RunManager" selected="Python.python main.py --config configs/map_10.json">
-    <configuration name="python main.py --config configs/map_10.json" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager">
+    <configuration name="Run Agent | Config - 10x10" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="delivery-agent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -167,34 +168,9 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="python main.py --config configs/map\_10.json" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="delivery-agent" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="DEBUG_JUST_MY_CODE" value="false" />
-      <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="main.py" />
-      <option name="PARAMETERS" value="--config configs/map\_10.json" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.python main.py --config configs/map_10.json" />
-        <item itemvalue="Python.python main.py --config configs/map\_10.json" />
+        <item itemvalue="Python.Run Agent | Config - 10x10" />
       </list>
     </recent_temporary>
   </component>

@@ -1,4 +1,3 @@
-"""Bounded pickup and delivery planning using observed letters only."""
 from dataclasses import dataclass
 
 from agents.delivery_strategy import DeadlineAwareStrategy
@@ -22,16 +21,10 @@ class _RouteState:
 
 
 class LookaheadStrategy(DeadlineAwareStrategy):
-    """Keep a bounded set of alternative pickup and delivery sequences.
+    """Keeps the best pickup and delivery plans within a limited search
 
-    A route is preferred when it delivers more observed letters on time,
-    then causes less total lateness, then finishes sooner. Partial routes
-    are ranked using an optimistic bound on unavoidable late deliveries.
-    Pruning makes this a heuristic, not an optimality guarantee.
-
-    Inherited delivery-only methods provide the fallback when no complete
-    route can be found. Future letters and hidden closures are never queried.
-    """
+    It prefers plans with fewer late letters, then less lateness, then shorter time
+    If no full plan is found, it falls back to simpler delivery logic"""
 
     def __init__(self, beam_width: int = 64):
         # default is 64 bc it gives not a bad speed and we have certainly one or more good routes in search quality
@@ -56,8 +49,8 @@ class LookaheadStrategy(DeadlineAwareStrategy):
             tuple(sorted(known_closures)),
             observation.remaining_capacity,
         )
-        # Walking alone does not trigger a new search. New observations,
-        # pickups, deliveries and closure-memory changes invalidate the plan.
+        # walking alone does not trigger a new search
+        # new observations, pickups, deliveries and closure-memory changes invalidate the plan
         if (signature == self._signature and self._goal is not None
                 and self._goal != observation.courier_position
                 and find_path(observation.courier_position, self._goal, carried)):
@@ -72,7 +65,7 @@ class LookaheadStrategy(DeadlineAwareStrategy):
         letters = sorted(carried + waiting,
                          key=lambda letter: (letter.deadline if letter.deadline is not None else float("inf"),
                                              letter.available_time, letter.letter_id))
-        # An isolated address must not prevent work on reachable letters.
+        #isolated address must not prevent work on reachable letters.
         letters = [letter for letter in letters
                    if find_path(observation.courier_position,
                                 letter.destination, None) is not None
@@ -142,7 +135,7 @@ class LookaheadStrategy(DeadlineAwareStrategy):
             return (state.late_count + unavoidable, state.time,
                     -state.delivered.bit_count(), state.lateness, state.first_stop)
 
-        # Each stop collects or delivers at least one letter: at most 2N stops.
+        # each stop collects or delivers at least one letter: at most 2N stops
         for _ in range(2 * len(letters) + 1):
             expanded = {}
             for state in beam:
@@ -184,7 +177,7 @@ class LookaheadStrategy(DeadlineAwareStrategy):
         collected, delivered = state.collected, state.delivered
         late_count, lateness = state.late_count, state.lateness
 
-        # Delivery frees bag space before pickup at this stop.
+        # delivery frees bag space before pickup at this stop.
         newly_delivered = delivery_mask & collected & ~delivered
         for index, deadline in enumerate(deadlines):
             if newly_delivered & (1 << index):
@@ -193,8 +186,9 @@ class LookaheadStrategy(DeadlineAwareStrategy):
                 lateness += delay
         delivered |= newly_delivered
         slots = capacity - (collected & ~delivered).bit_count()
-        # At a post, the agent collects waiting letters by appearance and ID.
-        # Waiting entries were sorted in that order by _plan.
+
+        # at post agent collects waiting letters by appearance and ID
+        # waiting entries were sorted in that order by func _plan
         for index in range(len(deadlines)):
             bit = 1 << index
             if slots and pickup_mask & bit and not collected & bit:
@@ -202,14 +196,7 @@ class LookaheadStrategy(DeadlineAwareStrategy):
                 deadlines[index] = now + allowances[index]
                 slots -= 1
 
-        # Pickup and destination can be the same address.
-        newly_delivered = delivery_mask & collected & ~delivered
-        for index, deadline in enumerate(deadlines):
-            if newly_delivered & (1 << index):
-                delay = max(0, now - deadline)
-                late_count += delay > 0
-                lateness += delay
-        delivered |= newly_delivered
+
         first_stop = goal if state.first_stop < 0 else state.first_stop
         return _RouteState(goal, collected, delivered, now,
                            late_count, lateness, first_stop, tuple(deadlines))

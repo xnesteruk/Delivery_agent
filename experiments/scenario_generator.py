@@ -120,8 +120,21 @@ class ScenarioGenerator:
         reachable = sorted(self._find_reachable_cells())
         if type(post_count) is not int or not 1 <= post_count <= len(reachable):
             raise ValueError("Post count must fit reachable street cells.")
-        posts = tuple(sorted(Random(derive_seed(seed, "posts")).sample(reachable, post_count)))
-        closure_cells = [cell for cell in self._destinations if cell not in posts]
+
+        posts = tuple(sorted(
+            Random(derive_seed(seed, "posts")).sample(reachable, post_count)
+        ))
+
+        non_post_cells = [
+            cell for cell in self._destinations
+            if cell not in posts
+        ]
+
+        if not non_post_cells:
+            raise ValueError("No delivery cells available outside pickup posts.")
+
+        closure_cells = non_post_cells
+
         if closure_count and not closure_cells:
             raise ValueError("No non-post cells available for closures.")
         letters_seed = derive_seed(seed, "letters")
@@ -138,7 +151,7 @@ class ScenarioGenerator:
         letters = []
 
         for letter_id in range(1, letter_count + 1):
-            destination = letters_random.choice(self._destinations)
+            destination = letters_random.choice(non_post_cells)
 
             available_time = arrival_times[letter_id - 1]
 

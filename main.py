@@ -41,7 +41,7 @@ def create_experiment_folder(results_path: Path) -> Path:
 def run_experiment(config_path: Path, results_path: Path) -> Path:
     with config_path.open(encoding="utf-8") as file:
         settings = json.load(file)
-    # Accept both the original flat config and the new experiment presets.
+    # accept both the original flat config and the new experiment presets.
     config = SimulationConfig(**settings.get("config", settings))
     post_settings = {"count": settings.get("pickup_posts", {}).get("count", 3)}
     master_seed = config.seed
@@ -150,7 +150,7 @@ def run_experiment(config_path: Path, results_path: Path) -> Path:
         run_path = batch_path / f"run_{run_number:03d}"
         run_path.mkdir()
 
-        # Preserve the exact generated scenario.
+        # preserve the exact generated scenario
         with (run_path / "scenario.json").open(
                 "w", encoding="utf-8"
         ) as file:
@@ -177,7 +177,7 @@ def run_experiment(config_path: Path, results_path: Path) -> Path:
             "simulation_minutes": result.simulation_minutes,
             "execution_seconds": result.execution_seconds,
         }
-        # Four disjoint outcomes account for every scheduled letter.
+        # four disjoint outcomes account for every letter
         row.update({
             "on_time_letters": metrics.on_time_letters,
             "awaiting_delivery_letters": metrics.undelivered_letters,

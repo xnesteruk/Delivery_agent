@@ -34,8 +34,9 @@ class LookaheadStrategy(DeadlineAwareStrategy):
     """
 
     def __init__(self, beam_width: int = 64):
+        # default is 64 bc it gives not a bad speed and we have certainly one or more good routes in search quality
         if type(beam_width) is not int or beam_width < 1:
-            raise ValueError("Beam width must be a positive integer.")
+            raise ValueError("Beam width must be > 0")
         self._beam_width = beam_width
         self._signature = None
         self._goal = None

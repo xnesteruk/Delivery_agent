@@ -44,8 +44,7 @@ class Simulation:
     def run(self) -> SimulationResult:
         if self._has_run:
             raise RuntimeError(
-                "Create a new simulation, environment and agent "
-                "for another experiment."
+                "Create a new simulation, environment and agent for another experiment"
             )
 
         self._has_run = True

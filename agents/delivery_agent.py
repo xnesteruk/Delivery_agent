@@ -32,10 +32,10 @@ class DeliveryAgent:
         )
         self._known_closures: dict[tuple[int, int], int] = {}
 
-        # Current delivery destination, retained between decisions.
+        # current delivery destination
         self._target_letter_id: int | None = None
 
-        # Commit to a pickup post when its visit improves the forecast.
+        # go to a pickup post when its visit improves the result
         self._pickup_target = None
         self._delivery_strategy = (delivery_strategy if delivery_strategy is not None else LookaheadStrategy())
         self._path_cache = {}
@@ -48,90 +48,21 @@ class DeliveryAgent:
     def target_letter_id(self) -> int | None:
         return self._target_letter_id
 
-    def choose_action(self, observation: AgentObservation) -> Action:
-        self._update_memory(observation)
-        # Forecasting evaluates many alternative routes against the same map.
-        # Reuse paths only within this decision so new observations can never
-        # leave a stale route in the cache.
-        self._path_cache.clear()
-        position = observation.courier_position
+    def _update_memory(self, observation: AgentObservation) -> None:
+        now = observation.current_time
+        vision = observation.vision
 
-        carried = [
-            letter
-            for letter in observation.letters
-            if letter.is_picked_up and not letter.is_delivered
-        ]
-        waiting = [
-            letter
-            for letter in observation.letters
-            if not letter.is_picked_up
-        ]
+        self._known_closures = {
+            cell: last_seen
+            for cell, last_seen in self._known_closures.items()
+            if now - last_seen < self._closure_memory_minutes
+        }
 
-        # Deliver any carried letter at the current address.
-        for letter in carried:
-            if letter.destination == position:
-                if letter.letter_id == self._target_letter_id:
-                    self._target_letter_id = None
-
-                return Action(
-                    ActionType.DELIVER,
-                    letter_id=letter.letter_id,
-                )
-
-        if observation.remaining_capacity > 0:
-            local = [letter for letter in waiting
-                     if self._post(letter, observation) == position]
-            if local:
-                letter = min(local, key=lambda item: (item.available_time, item.letter_id))
-                return Action(ActionType.PICK_UP, letter_id=letter.letter_id)
-
-        planned_stop = self._delivery_strategy.select_stop(
-            observation, self._move_minutes, self._find_path, self.known_closures,
-        )
-        if planned_stop is not None:
-            self._target_letter_id = next(
-                (letter.letter_id for letter in carried
-                 if letter.destination == planned_stop), None,
-            )
-            route = self._find_path(position, planned_stop, carried)
-            if route:
-                return Action(ActionType.MOVE, destination=route[0])
-
-        if self._pickup_target == position or observation.remaining_capacity == 0:
-            self._pickup_target = None
-        if self._pickup_target is not None:
-            if any(self._post(letter, observation) == self._pickup_target for letter in waiting):
-                path = self._find_path(position, self._pickup_target, carried)
-                if path:
-                    return Action(ActionType.MOVE, destination=path[0])
-            self._pickup_target = None
-
-        current_choice = self._get_current_delivery(position, carried, observation.current_time)
-        posts = self._pickup_choices(position, waiting, observation, carried)
-        if current_choice is not None:
-            current_letter, path = current_choice
-            if observation.remaining_capacity > 0 and posts:
-                baseline = self._forecast_delivery_score(
-                    observation, current_letter, carried, waiting, None)
-                candidates = []
-                for _, post, _ in posts:
-                    score = self._forecast_delivery_score(
-                        observation, current_letter, carried, waiting, post)
-                    if score is not None and baseline is not None and score < baseline:
-                        candidates.append((score, post))
-                if candidates:
-                    _, self._pickup_target = min(candidates, key=lambda item: item[0])
-                    self._target_letter_id = None
-                    route = self._find_path(position, self._pickup_target, carried)
-                    if route:
-                        return Action(ActionType.MOVE, destination=route[0])
-            return Action(ActionType.MOVE, destination=path[0])
-
-        if posts and observation.remaining_capacity > 0:
-            _, self._pickup_target, path = min(posts, key=lambda item: item[0])
-            if path:
-                return Action(ActionType.MOVE, destination=path[0])
-        return Action(ActionType.WAIT)
+        for cell in vision.visible_cells:
+            if cell in vision.visible_closures:
+                self._known_closures[cell] = now
+            else:
+                self._known_closures.pop(cell, None)
 
     @staticmethod
     def _post(letter: LetterInfo, observation: AgentObservation) -> Position:
@@ -155,22 +86,20 @@ class DeliveryAgent:
         return choices
 
     def _get_current_delivery(
-        self,
-        position: Position,
-        carried: list[LetterInfo],
-        current_time: int,
+            self,
+            position: Position,
+            carried: list[LetterInfo],
+            current_time: int,
     ) -> tuple[LetterInfo, list[Position]] | None:
-        # Keep the selected letter while a route remains available.
+        #loop through and keep first selected lette, and find path to it\\\
         for letter in carried:
             if letter.letter_id == self._target_letter_id:
                 path = self._find_path(position, letter.destination, carried)
-
                 if path is not None:
                     return letter, path
-
                 break
 
-        # The previous target is gone or currently unreachable.
+        #   previous target is already has path
         self._target_letter_id = None
 
         choice = self._delivery_strategy.select_delivery(
@@ -184,7 +113,7 @@ class DeliveryAgent:
         return letter, path
 
     def _forecast_delivery_score(
-        self, observation, current_letter, carried, waiting, pickup_target,
+            self, observation, current_letter, carried, waiting, pickup_target,
     ) -> tuple[int, int] | None:
         """Compare routes using observed letters only; no future arrivals."""
         position = observation.courier_position
@@ -237,9 +166,9 @@ class DeliveryAgent:
         return late_count, total_lateness
 
     def _travel_time(
-        self,
-        start: Position,
-        goal: Position,
+            self,
+            start: Position,
+            goal: Position,
     ) -> int | None:
         path = self._find_path(start, goal)
 
@@ -248,29 +177,12 @@ class DeliveryAgent:
 
         return len(path) * self._move_minutes
 
-    def _update_memory(self, observation: AgentObservation) -> None:
-        now = observation.current_time
-        vision = observation.vision
-
-        self._known_closures = {
-            cell: last_seen
-            for cell, last_seen in self._known_closures.items()
-            if now - last_seen < self._closure_memory_minutes
-        }
-
-        for cell in vision.visible_cells:
-            if cell in vision.visible_closures:
-                self._known_closures[cell] = now
-            else:
-                self._known_closures.pop(cell, None)
-
     def _find_path(
-        self,
-        start: Position,
-        goal: Position,
-        carried: list[LetterInfo] | None = None,
-    ) -> list[Position] | None:
-        """Find a shortest route; break ties by letters delivered on the way.
+            self,
+            start: Position,
+            goal: Position,
+            carried: list[LetterInfo] | None = None) -> list[Position] | None:
+        """Find the shortest route; break ties by letters delivered on the way.
 
         BFS processes cells by distance. For equal-distance alternatives,
         retain the predecessor yielding the most carried-letter deliveries.
@@ -310,10 +222,10 @@ class DeliveryAgent:
 
             x, y = current
             for neighbour in (
-                (x + 1, y),
-                (x, y + 1),
-                (x - 1, y),
-                (x, y - 1),
+                    (x + 1, y),
+                    (x, y + 1),
+                    (x - 1, y),
+                    (x, y - 1),
             ):
                 if not self._is_walkable(neighbour):
                     continue
@@ -326,8 +238,8 @@ class DeliveryAgent:
                     came_from[neighbour] = current
                     frontier.append(neighbour)
                 elif (
-                    distances[neighbour] == distance
-                    and count > delivery_counts[neighbour]
+                        distances[neighbour] == distance
+                        and count > delivery_counts[neighbour]
                 ):
                     # All predecessors are processed before this cell is popped.
                     delivery_counts[neighbour] = count
@@ -340,24 +252,24 @@ class DeliveryAgent:
         x, y = cell
 
         return (
-            0 <= x < self._map_width
-            and 0 <= y < self._map_height
-            and cell not in self._blocked_cells
+                0 <= x < self._map_width
+                and 0 <= y < self._map_height
+                and cell not in self._blocked_cells
         )
 
     def _is_walkable(self, cell: tuple[int, int]) -> bool:
         return (
-            self._is_static_walkable(cell)
-            and cell not in self._known_closures
+                self._is_static_walkable(cell)
+                and cell not in self._known_closures
         )
 
     def _restore_path(
-        self,
-        came_from: dict[
-            tuple[int, int],
-            tuple[int, int] | None,
-        ],
-        goal: tuple[int, int],
+            self,
+            came_from: dict[
+                tuple[int, int],
+                tuple[int, int] | None,
+            ],
+            goal: tuple[int, int],
     ) -> list[Position]:
         path = []
         current = goal
@@ -368,3 +280,84 @@ class DeliveryAgent:
 
         path.reverse()
         return path
+
+    def choose_action(self, observation: AgentObservation) -> Action:
+        self._update_memory(observation)
+        # forecasting evaluates many alternative routes
+        # reuse paths only within this decision so new observations can never leave a stale route in the cache
+        self._path_cache.clear()
+        position = observation.courier_position
+
+        carried = [
+            letter
+            for letter in observation.letters
+            if letter.is_picked_up and not letter.is_delivered
+        ]
+        waiting = [
+            letter
+            for letter in observation.letters
+            if not letter.is_picked_up
+        ]
+
+        # deliver any carried letter at the destin. address
+        for letter in carried:
+            if letter.destination == position:
+                if letter.letter_id == self._target_letter_id:
+                    self._target_letter_id = None
+
+                return Action( ActionType.DELIVER, letter_id=letter.letter_id)
+
+        if observation.remaining_capacity > 0:
+            local = [letter for letter in waiting
+                     if self._post(letter, observation) == position]
+            if local:
+                letter = min(local, key=lambda item: (item.available_time, item.letter_id))
+                return Action( ActionType.PICK_UP, letter_id=letter.letter_id)
+
+        planned_stop = self._delivery_strategy.select_stop(
+            observation, self._move_minutes, self._find_path, self.known_closures,
+        )
+        if planned_stop is not None:
+            self._target_letter_id = next(
+                (letter.letter_id for letter in carried
+                 if letter.destination == planned_stop), None,
+            )
+            route = self._find_path(position, planned_stop, carried)
+            if route:
+                return Action( ActionType.MOVE, destination=route[0])
+
+        if self._pickup_target == position or observation.remaining_capacity == 0:
+            self._pickup_target = None
+        if self._pickup_target is not None:
+            if any(self._post(letter, observation) == self._pickup_target for letter in waiting):
+                path = self._find_path(position, self._pickup_target, carried)
+                if path:
+                    return Action(ActionType.MOVE, destination=path[0])
+            self._pickup_target = None
+
+        current_choice = self._get_current_delivery(position, carried, observation.current_time)
+        posts = self._pickup_choices(position, waiting, observation, carried)
+        if current_choice is not None:
+            current_letter, path = current_choice
+            if observation.remaining_capacity > 0 and posts:
+                baseline = self._forecast_delivery_score(
+                    observation, current_letter, carried, waiting, None)
+                candidates = []
+                for _, post, _ in posts:
+                    score = self._forecast_delivery_score(
+                        observation, current_letter, carried, waiting, post)
+                    if score is not None and baseline is not None and score < baseline:
+                        candidates.append((score, post))
+                if candidates:
+                    _, self._pickup_target = min(candidates, key=lambda item: item[0])
+                    self._target_letter_id = None
+                    route = self._find_path(position, self._pickup_target, carried)
+                    if route:
+                        return Action(ActionType.MOVE, destination=route[0])
+            return Action(ActionType.MOVE, destination=path[0])
+
+        if posts and observation.remaining_capacity > 0:
+            _, self._pickup_target, path = min(posts, key=lambda item: item[0])
+            if path:
+                return Action(ActionType.MOVE, destination=path[0])
+        return Action(ActionType.WAIT)

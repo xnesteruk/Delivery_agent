@@ -11,7 +11,7 @@ class DeliveryStrategy(ABC):
     """Interface for an agent's delivery-order policy."""
 
     def select_stop(self, observation, move_minutes, find_path, known_closures):
-        """Optionally plan a pickup or delivery stop; None uses delivery routing."""
+        """abstract method, should be implemented """
         return None
 
     @abstractmethod

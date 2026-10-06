@@ -16,9 +16,9 @@ class SimulationConfig:
         self.delivery_allowance_minutes = delivery_allowance_minutes
         self.seed = seed
 
-        # Fixed rules of our simulation
-        self._cell_distance_meters = 500
+        # rules of moves, time per cell
         self._move_minutes = 6
+        self._cell_distance_meters = 500
 
     @classmethod
     def from_json(cls, path: str | Path) -> "SimulationConfig":
